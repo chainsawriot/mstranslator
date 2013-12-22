@@ -4,8 +4,8 @@
 ### Will be packaged for CRAN later
 
 
-require(XML)
-require(httr)
+#require(XML)
+#require(httr)
 Translator <- setRefClass("Translator",
                           fields = list(
                               client_id = "character",
@@ -32,16 +32,29 @@ Translator <- setRefClass("Translator",
                                       #cat("Need to update")
                                       req_token()
                                   }
-                                  if (length(default_toLang) == 0 & is.na(toLang)) {
+                                  if (nchar(default_toLang) == 0 & is.na(toLang)) {
                                       stop("Please provide toLang")
-                                  } else if (length(default_toLang) > 0 & is.na(toLang)) {
+                                  } else if (nchar(default_toLang) > 0 & is.na(toLang)) {
                                       toLang <- default_toLang
                                   }
                                   xml_content <- content(GET(url="http://api.microsofttranslator.com/V2/Http.svc/Translate", query=list(text = text, to = toLang), add_headers(Authorization = paste0("bearer ", token))), type="text", encoding="utf-8")
                                   return(xmlToList(xml_content))
                               })
-                          
 )
+
+#' Constructor for the Translator instance
+#'
+#' This function generates a new Translator instance to use the Microsoft Translator API
+#'
+#' @param client_id Client ID
+#' @param client_secret Client secret
+#' @param default_toLang Default Language to output
+#' @export
+
+translator <- function(client_id, client_secret, default_toLang= "" ) {
+    return(Translator$new(client_id=client_id, client_secret=client_secret, default_toLang=default_toLang))
+}
+
 
 #client_id = ""
 #client_secret = ""

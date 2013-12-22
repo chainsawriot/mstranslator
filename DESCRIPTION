@@ -1,0 +1,16 @@
+Package: mstranslator
+Title: R wrapper of Microsoft Translator API
+Version: 0.1
+Maintainer: Chung-hong Chan <chainsawtiney@gmail.com>
+Author: Chung-hong Chan <chainsawtiney@gmail.com>
+Description: An R5 object to use the Machine Traslation Service provided by
+    Microsoft.
+Depends:
+    R (>= 3.0.0)
+License: GPL-2
+Imports:
+    httr,
+    XML
+Collate:
+    'mstransR5.R'
+    'mstranslator-package.r'
