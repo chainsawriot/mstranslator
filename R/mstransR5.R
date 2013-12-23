@@ -11,6 +11,7 @@ Translator <- setRefClass("Translator",
                               client_id = "character",
                               client_secret = "character",
                               default_toLang="character",
+                              default_fromLang="character",
                               token="character",
                               expiry="POSIXct"),
                           methods = list(
@@ -27,7 +28,7 @@ Translator <- setRefClass("Translator",
                                       return(FALSE)
                                   }
                               },
-                              translate = function(text, toLang=NA) {
+                              translate = function(text, fromLang=NA, toLang=NA) {
                                   if (check_expire()) {
                                       #cat("Need to update")
                                       req_token()
@@ -37,7 +38,13 @@ Translator <- setRefClass("Translator",
                                   } else if (nchar(default_toLang) > 0 & is.na(toLang)) {
                                       toLang <- default_toLang
                                   }
-                                  xml_content <- content(GET(url="http://api.microsofttranslator.com/V2/Http.svc/Translate", query=list(text = text, to = toLang), add_headers(Authorization = paste0("bearer ", token))), type="text", encoding="utf-8")
+                                  if (is.na(fromLang) & nchar(default_fromLang) == 0) {
+                                      xml_content <- content(GET(url="http://api.microsofttranslator.com/V2/Http.svc/Translate", query=list(text = text, to = toLang), add_headers(Authorization = paste0("bearer ", token))), type="text", encoding="utf-8") ### use language detection
+                                  } else if (!is.na(fromLang)) {
+                                      xml_content <- content(GET(url="http://api.microsofttranslator.com/V2/Http.svc/Translate", query=list(text = text, to = toLang, from=fromLang), add_headers(Authorization = paste0("bearer ", token))), type="text", encoding="utf-8")
+                                  } else {
+                                      xml_content <- content(GET(url="http://api.microsofttranslator.com/V2/Http.svc/Translate", query=list(text = text, to = toLang, from=default_fromLang), add_headers(Authorization = paste0("bearer ", token))), type="text", encoding="utf-8")
+                                  }
                                   return(xmlToList(xml_content))
                               })
 )
@@ -49,10 +56,15 @@ Translator <- setRefClass("Translator",
 #' @param client_id Client ID
 #' @param client_secret Client secret
 #' @param default_toLang Default Language to output
+#' @param default_fromLang Default Language input
 #' @export
+#' @examples
+#' ## use your own client id and client secret
+#' # chi_trans <- translator(client_id="yourclientid", client_secret="yourclientsecret", default_toLang="zh-CHS")
+#' # chi_trans$translate( "曼德拉是無神論者", fromLang="zh-CHT", toLang="en")
 
-translator <- function(client_id, client_secret, default_toLang= "" ) {
-    return(Translator$new(client_id=client_id, client_secret=client_secret, default_toLang=default_toLang))
+translator <- function(client_id, client_secret, default_toLang= "", default_fromLang="") {
+    return(Translator$new(client_id=client_id, client_secret=client_secret, default_toLang=default_toLang, default_fromLang=default_fromLang))
 }
 
 
