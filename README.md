@@ -2,6 +2,13 @@
 
 An R wrapper for the Microsoft Translator API
 
+## installation
+
+```R
+require(devtools)
+install_github("mstranslator", "chainsawriot")
+```
+
 ## Example
 
 ```R
